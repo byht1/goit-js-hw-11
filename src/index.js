@@ -1,22 +1,42 @@
-const axios = require('axios').default;
+import galleryCard from './templares/gallery.hbs';
+import ButtonPlusDataServer from './js/button';
+import Server from './js/server';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
-const KEY = '27696638-26ff957efade4726366145eb0';
-const name = 'cat';
-const URL = `https://pixabay.com/api/?key=${KEY}&q=${name}&image_type=photo&orientation=horizontal&safesearch=true`;
+const NewButtonPlusDataServer = new ButtonPlusDataServer();
+const NewServer = new Server();
 
-axios.get(URL);
-// axios.get(
-//   'https://pixabay.com/api/?key=27696638-26ff957efade4726366145eb0&q=yellow+flowers&image_type=photo',
-// );
-bay()
-  .then(x => x.data)
-  .then(x => x.hits)
-  .then(console.log);
+const ref = {
+  form: document.querySelector('#search-form'),
+  gallery: document.querySelector('.gallery'),
+  section: document.querySelector('.gallery-secrion'),
+};
 
-async function bay() {
-  try {
-    const z = await axios.get(URL);
-    // const j = await z.json();
-    return z;
-  } catch (error) {}
+ref.form.addEventListener('submit', submitForm);
+
+// GENERAPOT HTML
+
+async function generatorHtml() {
+  const data = await NewServer.serverData();
+  const hits = await data.hits;
+  if (hits.length === 0) {
+    Notify.failure('Sorry, there are no images matching your search query. Please try again.');
+    return;
+  }
+  const arr = await hits.map(galleryCard);
+
+  ref.gallery.innerHTML = ``;
+  ref.gallery.insertAdjacentHTML('afterbegin', arr.join(''));
+  NewButtonPlusDataServer.buttonShow();
+}
+
+// SUBMIT FORMS
+
+function submitForm() {
+  event.preventDefault();
+  const {
+    elements: { searchQuery },
+  } = event.currentTarget;
+  NewServer.name = searchQuery.value;
+  generatorHtml();
 }
