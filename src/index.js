@@ -10,13 +10,27 @@ const ref = {
   form: document.querySelector('#search-form'),
   gallery: document.querySelector('.gallery'),
   section: document.querySelector('.gallery-secrion'),
+  button: document.querySelector('.load-more'),
 };
 
 ref.form.addEventListener('submit', submitForm);
+ref.button.addEventListener('click', addPhoto);
 
 // GENERAPOT HTML
+async function addPhoto() {
+  NewServer.page += 1;
+  await weDrawHtml();
+  await window.scrollBy({ top: 550, behavior: 'smooth' });
+  window.scroll;
+}
 
 async function generatorHtml() {
+  ref.gallery.innerHTML = '';
+  weDrawHtml();
+  NewButtonPlusDataServer.buttonShow();
+}
+
+async function weDrawHtml() {
   const data = await NewServer.serverData();
   const hits = await data.hits;
   if (hits.length === 0) {
@@ -24,10 +38,7 @@ async function generatorHtml() {
     return;
   }
   const arr = await hits.map(galleryCard);
-
-  ref.gallery.innerHTML = ``;
-  ref.gallery.insertAdjacentHTML('afterbegin', arr.join(''));
-  NewButtonPlusDataServer.buttonShow();
+  ref.gallery.insertAdjacentHTML('beforeend', arr.join(''));
 }
 
 // SUBMIT FORMS
@@ -38,5 +49,6 @@ function submitForm() {
     elements: { searchQuery },
   } = event.currentTarget;
   NewServer.name = searchQuery.value;
+  NewServer.page = 1;
   generatorHtml();
 }
