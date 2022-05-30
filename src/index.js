@@ -4,6 +4,7 @@ import Server from './js/server';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+const throttle = require('lodash.throttle');
 
 const NewButtonPlusDataServer = new ButtonPlusDataServer();
 const NewServer = new Server();
@@ -36,14 +37,14 @@ async function addPhoto() {
 
   await weDrawHtml();
   await noMore();
-  const { height: cardHeight } = document
-    .querySelector('.gallery')
-    .firstElementChild.getBoundingClientRect();
+  // const { height: cardHeight } = document
+  //   .querySelector('.gallery')
+  //   .firstElementChild.getBoundingClientRect();
 
-  window.scrollBy({
-    top: cardHeight * 2,
-    behavior: 'smooth',
-  });
+  // window.scrollBy({
+  //   top: cardHeight * 2,
+  //   behavior: 'smooth',
+  // });
 }
 
 async function generatorHtml() {
@@ -98,3 +99,21 @@ function noMore() {
     Notify.info("We're sorry, but you've reached the end of search results.");
   }
 }
+throttle;
+
+window.addEventListener(
+  'scroll',
+  throttle(() => {
+    let contentHeight = ref.gallery.offsetHeight; // 1) высота блока контента вместе с границами
+    let yOffset = window.pageYOffset; // 2) текущее положение скролбара
+    let window_height = window.innerHeight; // 3) высота внутренней области окна документа
+    let y = yOffset + window_height;
+
+    // если пользователь достиг конца
+    if (y >= contentHeight) {
+      //загружаем новое содержимое в элемент
+      addPhoto();
+    }
+    console.log(1);
+  }, 500),
+);
