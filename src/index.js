@@ -122,6 +122,5 @@ window.addEventListener(
       //загружаем новое содержимое в элемент
       addPhoto();
     }
-    console.log(1);
   }, 500),
 );
