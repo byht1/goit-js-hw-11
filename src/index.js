@@ -2,6 +2,8 @@ import galleryCard from './templares/gallery.hbs';
 import ButtonPlusDataServer from './js/button';
 import Server from './js/server';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const NewButtonPlusDataServer = new ButtonPlusDataServer();
 const NewServer = new Server();
@@ -12,12 +14,20 @@ let total = 0;
 const ref = {
   form: document.querySelector('#search-form'),
   gallery: document.querySelector('.gallery'),
-  section: document.querySelector('.gallery-secrion'),
   button: document.querySelector('.load-more'),
 };
 
 ref.form.addEventListener('submit', submitForm);
 ref.button.addEventListener('click', addPhoto);
+ref.gallery.addEventListener('click', () => {
+  event.preventDefault();
+  console.log(event.target.nodeName);
+});
+
+const galleryBig = new SimpleLightbox('.photo-card a');
+galleryBig.on('show.simplelightbox', () => {
+  galleryBig.defaultOptions.captionDelay = 250;
+});
 
 // GENERAPOT HTML
 async function addPhoto() {
@@ -26,7 +36,14 @@ async function addPhoto() {
 
   await weDrawHtml();
   await noMore();
-  await window.scrollBy({ top: 550, behavior: 'smooth' });
+  const { height: cardHeight } = document
+    .querySelector('.gallery')
+    .firstElementChild.getBoundingClientRect();
+
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: 'smooth',
+  });
 }
 
 async function generatorHtml() {
@@ -45,13 +62,12 @@ async function weDrawHtml() {
     NewButtonPlusDataServer.buttonNoMoreHope();
     Notify.failure('Sorry, there are no images matching your search query. Please try again.');
     return;
-  } else {
-    Notify.success(`Hooray! We found ${totalMax} images.`);
   }
 
   NewButtonPlusDataServer.buttonLoadung();
   const arr = await hits.map(galleryCard);
   ref.gallery.insertAdjacentHTML('beforeend', arr.join(''));
+  galleryBig.refresh();
 }
 
 // SUBMIT FORMS
@@ -69,8 +85,11 @@ function submitForm() {
 
   NewButtonPlusDataServer.buttonShow();
   NewButtonPlusDataServer.buttonPreLoadung();
-  generatorHtml();
-  noMore();
+  generatorHtml()
+    .then(noMore)
+    .then(() => {
+      Notify.success(`Hooray! We found ${totalMax} images.`);
+    });
 }
 
 function noMore() {
