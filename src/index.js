@@ -36,7 +36,9 @@ async function addPhoto() {
   NewServer.page += 1;
 
   await weDrawHtml();
-  await noMore();
+  if (totalMax > 0) {
+    noMore();
+  }
   // const { height: cardHeight } = document
   //   .querySelector('.gallery')
   //   .firstElementChild.getBoundingClientRect();
@@ -87,9 +89,15 @@ function submitForm() {
   NewButtonPlusDataServer.buttonShow();
   NewButtonPlusDataServer.buttonPreLoadung();
   generatorHtml()
-    .then(noMore)
     .then(() => {
-      Notify.success(`Hooray! We found ${totalMax} images.`);
+      if (totalMax > 0) {
+        noMore();
+      }
+    })
+    .then(() => {
+      if (totalMax > 0) {
+        Notify.success(`Hooray! We found ${totalMax} images.`);
+      }
     });
 }
 
@@ -105,12 +113,16 @@ window.addEventListener(
   'scroll',
   throttle(() => {
     let contentHeight = ref.gallery.offsetHeight; // 1) высота блока контента вместе с границами
+    console.log('🚀 ~ contentHeight', contentHeight);
     let yOffset = window.pageYOffset; // 2) текущее положение скролбара
+    console.log('🚀 ~ yOffset', yOffset);
     let window_height = window.innerHeight; // 3) высота внутренней области окна документа
+    console.log('🚀 ~ window_height', window_height);
     let y = yOffset + window_height;
+    console.log('🚀 ~ y', y);
 
     // если пользователь достиг конца
-    if (y >= contentHeight) {
+    if (y - 200 >= contentHeight) {
       //загружаем новое содержимое в элемент
       addPhoto();
     }
