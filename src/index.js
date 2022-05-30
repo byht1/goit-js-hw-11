@@ -113,13 +113,9 @@ window.addEventListener(
   'scroll',
   throttle(() => {
     let contentHeight = ref.gallery.offsetHeight; // 1) высота блока контента вместе с границами
-    console.log('🚀 ~ contentHeight', contentHeight);
     let yOffset = window.pageYOffset; // 2) текущее положение скролбара
-    console.log('🚀 ~ yOffset', yOffset);
     let window_height = window.innerHeight; // 3) высота внутренней области окна документа
-    console.log('🚀 ~ window_height', window_height);
     let y = yOffset + window_height;
-    console.log('🚀 ~ y', y);
 
     // если пользователь достиг конца
     if (y - 200 >= contentHeight) {
